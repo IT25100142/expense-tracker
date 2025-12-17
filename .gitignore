@@ -1,0 +1,12 @@
+Dependencies
+
+node_modules/
+
+Local Database (Don't overwrite live data with local test data)
+
+expenses.db
+
+System Files
+
+.DS_Store
+Thumbs.db

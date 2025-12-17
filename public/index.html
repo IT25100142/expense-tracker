@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Expense Tracker</title>
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Our Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fa-solid fa-wallet"></i> ExpenseTracker</h1>
+    <p class="subtitle" id="rate-display">
+        <i class="fa-solid fa-sync fa-spin"></i> Fetching live currency rates...
+    </p>
+
+    <!-- Totals Cards -->
+    <div class="totals-container">
+        <div class="total-card lkr">
+            <span class="card-label">Total Spent (LKR)</span>
+            <span id="total-lkr" class="total-amount">Rs. 0</span>
+            <i class="fa-solid fa-coins" style="position: absolute; right: 20px; bottom: 20px; opacity: 0.2; font-size: 3rem;"></i>
+        </div>
+        <div class="total-card usd">
+            <span class="card-label">Total Spent (USD)</span>
+            <span id="total-usd" class="total-amount">$ 0</span>
+            <i class="fa-solid fa-earth-americas" style="position: absolute; right: 20px; bottom: 20px; opacity: 0.2; font-size: 3rem;"></i>
+        </div>
+        <!-- Companion Stats -->
+        <div class="total-card companion">
+            <span class="card-label">Top Companion</span>
+            <span id="top-companion" class="total-amount">-</span>
+            <i class="fa-solid fa-user-group" style="position: absolute; right: 20px; bottom: 20px; opacity: 0.2; font-size: 3rem;"></i>
+        </div>
+    </div>
+    
+    <!-- Tools Section -->
+    <div class="tools-grid">
+        <!-- Calculator Tool -->
+        <div class="tool-card calculator">
+            <div class="tool-title"><i class="fa-solid fa-calculator"></i> Quick Calculator</div>
+            <div class="calc-display" id="calc-display">0</div>
+            <div class="calc-keys">
+                <button class="calc-btn clear" onclick="clearCalc()">C</button>
+                <button class="calc-btn op" onclick="appendCalc('/')">/</button>
+                <button class="calc-btn op" onclick="appendCalc('*')">×</button>
+                <button class="calc-btn op" onclick="backspaceCalc()">⌫</button>
+                
+                <button class="calc-btn" onclick="appendCalc('7')">7</button>
+                <button class="calc-btn" onclick="appendCalc('8')">8</button>
+                <button class="calc-btn" onclick="appendCalc('9')">9</button>
+                <button class="calc-btn op" onclick="appendCalc('-')">-</button>
+                
+                <button class="calc-btn" onclick="appendCalc('4')">4</button>
+                <button class="calc-btn" onclick="appendCalc('5')">5</button>
+                <button class="calc-btn" onclick="appendCalc('6')">6</button>
+                <button class="calc-btn op" onclick="appendCalc('+')">+</button>
+                
+                <button class="calc-btn" onclick="appendCalc('1')">1</button>
+                <button class="calc-btn" onclick="appendCalc('2')">2</button>
+                <button class="calc-btn" onclick="appendCalc('3')">3</button>
+                <button class="calc-btn eq" onclick="calculateResult()">=</button>
+                
+                <button class="calc-btn" style="grid-column: span 2" onclick="appendCalc('0')">0</button>
+                <button class="calc-btn" onclick="appendCalc('.')">.</button>
+            </div>
+        </div>
+
+        <!-- Currency Converter Tool -->
+        <div class="tool-card converter">
+            <div class="tool-title"><i class="fa-solid fa-money-bill-transfer"></i> Currency Exchange</div>
+            <div class="converter-form">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-coins"></i>
+                    <!-- Added min="0" here -->
+                    <input type="number" id="conv-amount" placeholder="Amount" min="0" oninput="convertCurrency()">
+                </div>
+                
+                <div style="display:flex; align-items: center; gap: 10px;">
+                    <select id="conv-from" onchange="convertCurrency()">
+                        <option value="USD">USD ($)</option>
+                        <option value="LKR">LKR (Rs)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                    <button class="swap-btn" onclick="swapCurrencies()"><i class="fa-solid fa-right-left"></i></button>
+                    <select id="conv-to" onchange="convertCurrency()">
+                        <option value="LKR">LKR (Rs)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                </div>
+
+                <div class="convert-result" id="conv-result">
+                    0.00
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Entry Form -->
+    <form id="expenseForm">
+        <div class="full-width input-group">
+            <label>Description</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-pen"></i>
+                <input type="text" id="description" required placeholder="What did you buy?">
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Amount</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <!-- Added min="0.01" here -->
+                <input type="number" id="amount" step="0.01" min="0.01" required placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Currency</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                <select id="currency">
+                    <option value="LKR">LKR (Rs)</option>
+                    <option value="USD">USD ($)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="full-width input-group">
+            <label>Category</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-tags"></i>
+                <select id="category">
+                    <option value="Food">🍔 Food & Dining</option>
+                    <option value="Transport">🚌 Transport</option>
+                    <option value="Shopping">🛍️ Shopping</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Bills">💡 Bills & Utilities</option>
+                    <option value="Education">📚 Education</option>
+                    <option value="Health">🏥 Health & Fitness</option>
+                    <option value="Travel">✈️ Travel</option>
+                    <option value="Other">✨ Other</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Optional Spent With Field -->
+        <div class="full-width input-group">
+            <label>Spent with (Optional)</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-user-group"></i>
+                <input type="text" id="spent-with" placeholder="e.g. John, Sarah (Leave empty if alone)">
+            </div>
+        </div>
+        
+        <button type="submit" id="addBtn"><i class="fa-solid fa-plus"></i> Add Transaction</button>
+    </form>
+
+    <h2><i class="fa-solid fa-list-ul"></i> Recent Activity</h2>
+    <ul id="expenseList">
+        <!-- List items load here -->
+    </ul>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
